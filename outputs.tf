@@ -12,4 +12,3 @@ output "nlb_dns_name" {
   description = "The name given to the ELB just created"
   value       = "${aws_lb.balancer.dns_name}"
 }
-
