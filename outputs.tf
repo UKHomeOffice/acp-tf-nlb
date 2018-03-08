@@ -8,6 +8,11 @@ output "nlb_id" {
   value       = "${aws_lb.balancer.id}"
 }
 
+output "nlb_name" {
+  description = "The name of the network load balancer we are creating"
+  value       = "${var.name}"
+}
+
 output "nlb_dns_name" {
   description = "The name given to the ELB just created"
   value       = "${aws_lb.balancer.dns_name}"
