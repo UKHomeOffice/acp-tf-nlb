@@ -8,6 +8,11 @@ output "nlb_id" {
   value       = "${aws_lb.balancer.id}"
 }
 
+output "nlb_arn" {
+  description = "The AWS ARN of the NLB which has been created"
+  value       = "${aws_lb.balancer.arn}"
+}
+
 output "nlb_name" {
   description = "The name of the network load balancer we are creating"
   value       = "${var.name}"
