@@ -15,26 +15,7 @@
  *        subnet_tags {
  *          Role = "some_tag"
  *        }
- *        ingress = [
- *          {
- *            port = "80"
- *            cidr = "0.0.0.0/0"
- *          },
- *          {
- *            port = "443"
- *            cidr = "0.0.0.0/0"
- *          },
- *        ]
- *        egress = [
- *          {
- *            port = "30200"
- *            cidr = "0.0.0.0/0"
- *          },
- *          {
- *            port = "30201"
- *            cidr = "0.0.0.0/0"
- *          },
- *        ]
+ *
  *        listeners = [
  *          {
  *            port         = "80"
@@ -60,42 +41,6 @@ data "aws_subnet_ids" "selected" {
 # Get the host zone id
 data "aws_route53_zone" "selected" {
   name = "${var.dns_zone}."
-}
-
-## Security Group for the ELB
-resource "aws_security_group" "sg" {
-  name        = "${var.environment}-${var.name}-nlb"
-  description = "The security group for ALB on service: ${var.name}, environment: ${var.environment}"
-  vpc_id      = "${var.vpc_id}"
-
-  tags = "${merge(var.tags,
-    map("Name", format("%s-%s-nlb", var.environment, var.name)),
-    map("Env", var.environment),
-    map("KubernetesCluster", var.environment))}"
-}
-
-# Ingress Rules
-resource "aws_security_group_rule" "ingress" {
-  count = "${length(var.ingress)}"
-
-  type              = "ingress"
-  security_group_id = "${aws_security_group.sg.id}"
-  protocol          = "tcp"
-  from_port         = "${lookup(var.ingress[count.index], "port")}"
-  to_port           = "${lookup(var.ingress[count.index], "port")}"
-  cidr_blocks       = ["${lookup(var.ingress[count.index],"cidr")}"]
-}
-
-# Egress Rules
-resource "aws_security_group_rule" "egress" {
-  count = "${length(var.egress)}"
-
-  type              = "egress"
-  security_group_id = "${aws_security_group.sg.id}"
-  protocol          = "tcp"
-  from_port         = "${lookup(var.egress[count.index], "port")}"
-  to_port           = "${lookup(var.egress[count.index], "port")}"
-  cidr_blocks       = ["${lookup(var.egress[count.index],"cidr")}"]
 }
 
 ## Create a listen and target group for each of the listeners
@@ -151,7 +96,6 @@ resource "aws_lb" "balancer" {
 
   internal           = "${var.internal}"
   load_balancer_type = "network"
-  security_groups    = ["${aws_security_group.sg.id}"]
   subnets            = ["${data.aws_subnet_ids.selected.ids}"]
 
   tags = "${merge(var.tags,

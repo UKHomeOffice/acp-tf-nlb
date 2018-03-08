@@ -35,21 +35,6 @@ variable "listeners" {
   type        = "list"
 }
 
-variable "ingress" {
-  description = "A containing the port and cidr which are permitted access to the NLB"
-  type        = "list"
-}
-
-variable "egress" {
-  description = "A map containing the port and cidr which are permitted "
-  type        = "list"
-}
-
-variable "security_groups" {
-  description = "An optional list of security groups added to the created ELB"
-  default     = []
-}
-
 variable "tags" {
   description = "A map of tags which will be added to the ELB cloud tags, by default Name, Env and KubernetesCluster is added"
   default     = {}
