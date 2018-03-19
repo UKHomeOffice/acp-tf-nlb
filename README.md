@@ -57,6 +57,8 @@ Module usage:
 | Name | Description |
 |------|-------------|
 | dns |  |
+| nlb_arn |  |
 | nlb_dns_name |  |
 | nlb_id |  |
+| nlb_name |  |
 
