@@ -94,9 +94,10 @@ resource "aws_lb_listener" "listeners" {
 resource "aws_lb" "balancer" {
   name = "${var.environment}-${var.name}-nlb"
 
-  internal           = "${var.internal}"
-  load_balancer_type = "network"
-  subnets            = ["${data.aws_subnet_ids.selected.ids}"]
+  enable_cross_zone_load_balancing = "true"
+  internal                         = "${var.internal}"
+  load_balancer_type               = "network"
+  subnets                          = ["${data.aws_subnet_ids.selected.ids}"]
 
   tags = "${merge(var.tags,
     map("Name", format("%s-%s", var.environment, var.name)),
