@@ -17,7 +17,7 @@ variable "dns_name" {
 
 variable "dns_type" {
   description = "The dns record type to use when adding the dns entry"
-  default     = "CNAME"
+  default     = "A"
 }
 
 variable "elb_role_tag" {
