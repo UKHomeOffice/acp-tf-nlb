@@ -37,7 +37,7 @@ Module usage:
 |------|-------------|:-----:|:-----:|
 | deregistration_delay | The amount time for Elastic Load Balancing to wait before changing the state of a deregistering target from draining to unused | `300` | no |
 | dns_name | An optional hostname to add to the hosting zone, otherwise defaults to var.name | `` | no |
-| dns_type | The dns record type to use when adding the dns entry | `CNAME` | no |
+| dns_type | The dns record type to use when adding the dns entry | `A` | no |
 | dns_zone | The AWS route53 domain name hosting the dns entry, i.e. example.com | - | yes |
 | elb_role_tag | The role tag applied to the subnets used for ELB, i.e. Role = elb-subnet | `elb-subnets` | no |
 | environment | An envionment name for the ELB, i.e. prod, dev, ci etc and used to search for assets | - | yes |
