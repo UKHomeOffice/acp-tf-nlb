@@ -32,7 +32,7 @@ variable "subnet_tags" {
 
 variable "listeners" {
   description = "An array of listeners to setup for the NLB"
-  type        = "list"
+  type        = list(map(string))
 }
 
 variable "tags" {
