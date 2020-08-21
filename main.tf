@@ -54,6 +54,7 @@ resource "aws_lb_target_group" "target_groups" {
   deregistration_delay = var.deregistration_delay
   port                 = var.listeners[count.index]["target_port"]
   protocol             = "TCP"
+  proxy_protocol_v2    = lookup(var.listeners[count.index], "proxy_protocol_v2", false)
   vpc_id               = var.vpc_id
 
   health_check {
