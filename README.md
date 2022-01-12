@@ -1,3 +1,4 @@
+<!-- BEGIN_TF_DOCS -->
 Module usage:
 
      module "nlb" {
@@ -5,60 +6,86 @@ Module usage:
 
        name            = "my-service"
        environment     = "dev"            # by default both Name and Env is added to the tags
-       dns_zone        = "example.com"
-       vpc_id          = "vpc-32323232"
+       dns\_zone        = "example.com"
+       vpc\_id          = "vpc-32323232"
        tags            = {
-         Role = "some_tag"
+         Role = "some\_tag"
        }
        # A series of tags applied to filter out the source subnets, by default Env and Role = elb-subnet is used
-       subnet_tags {
-         Role = "some_tag"
+       subnet\_tags {
+         Role = "some\_tag"
        }
 
        listeners = [
          {
            port         = "80"
-           target_port  = "30200"
-           target_group = "compute"
+           target\_port  = "30200"
+           target\_group = "compute"
          },
          {
            port         = "443"
-           target_port  = "30201"
-           target_group = "compute"
+           target\_port  = "30201"
+           target\_group = "compute"
          }
        ]
      }
 
+## Requirements
 
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0 |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 3.71.0 |
+
+## Modules
+
+No modules.
+
+## Resources
+
+| Name | Type |
+|------|------|
+| [aws_autoscaling_attachment.asg_attachment](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/autoscaling_attachment) | resource |
+| [aws_lb.balancer](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb) | resource |
+| [aws_lb_listener.listeners](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener) | resource |
+| [aws_lb_target_group.target_groups](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_target_group) | resource |
+| [aws_route53_record.dns](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record) | resource |
+| [aws_route53_zone.selected](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/route53_zone) | data source |
+| [aws_subnet_ids.selected](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/subnet_ids) | data source |
 
 ## Inputs
 
-| Name | Description | Default | Required |
-|------|-------------|:-----:|:-----:|
-| deregistration_delay | The amount time for Elastic Load Balancing to wait before changing the state of a deregistering target from draining to unused | `300` | no |
-| dns_name | An optional hostname to add to the hosting zone, otherwise defaults to var.name | `` | no |
-| dns_type | The dns record type to use when adding the dns entry | `A` | no |
-| dns_zone | The AWS route53 domain name hosting the dns entry, i.e. example.com | - | yes |
-| elb_role_tag | The role tag applied to the subnets used for ELB, i.e. Role = elb-subnet | `elb-subnets` | no |
-| environment | An envionment name for the ELB, i.e. prod, dev, ci etc and used to search for assets | - | yes |
-| health_check_interval | The interval between performing a health check | `30` | no |
-| healthy_threshold | The number of consecutive health checks successes required before considering an unhealthy target healthy | `3` | no |
-| idle_timeout | The timeout applie to idle ELB connections | `120` | no |
-| internal | Indicates if the ELB should be an internal load balancer, defaults to true | `true` | no |
-| listeners | An array of listeners to setup for the NLB | - | yes |
-| name | A descriptive name for this ELB | - | yes |
-| subnet_tags | A map of tags used to filter the subnets you want the ELB attached | `<map>` | no |
-| tags | A map of tags which will be added to the ELB cloud tags, by default Name, Env and KubernetesCluster is added | `<map>` | no |
-| unhealthy_threshold | The number of consecutive health check failures required before considering the target unhealthy | `3` | no |
-| vpc_id | The VPC id you are building the network load balancer in | - | yes |
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_deregistration_delay"></a> [deregistration\_delay](#input\_deregistration\_delay) | The amount time for Elastic Load Balancing to wait before changing the state of a deregistering target from draining to unused | `string` | `"300"` | no |
+| <a name="input_dns_name"></a> [dns\_name](#input\_dns\_name) | An optional hostname to add to the hosting zone, otherwise defaults to var.name | `string` | `""` | no |
+| <a name="input_dns_type"></a> [dns\_type](#input\_dns\_type) | The dns record type to use when adding the dns entry | `string` | `"A"` | no |
+| <a name="input_dns_zone"></a> [dns\_zone](#input\_dns\_zone) | The AWS route53 domain name hosting the dns entry, i.e. example.com | `any` | n/a | yes |
+| <a name="input_elb_role_tag"></a> [elb\_role\_tag](#input\_elb\_role\_tag) | The role tag applied to the subnets used for ELB, i.e. Role = elb-subnet | `string` | `"elb-subnets"` | no |
+| <a name="input_environment"></a> [environment](#input\_environment) | An envionment name for the ELB, i.e. prod, dev, ci etc and used to search for assets | `any` | n/a | yes |
+| <a name="input_health_check_interval"></a> [health\_check\_interval](#input\_health\_check\_interval) | The interval between performing a health check | `string` | `"30"` | no |
+| <a name="input_healthy_threshold"></a> [healthy\_threshold](#input\_healthy\_threshold) | The number of consecutive health checks successes required before considering an unhealthy target healthy | `string` | `"3"` | no |
+| <a name="input_idle_timeout"></a> [idle\_timeout](#input\_idle\_timeout) | The timeout applie to idle ELB connections | `string` | `"120"` | no |
+| <a name="input_internal"></a> [internal](#input\_internal) | Indicates if the ELB should be an internal load balancer, defaults to true | `bool` | `true` | no |
+| <a name="input_listeners"></a> [listeners](#input\_listeners) | An array of listeners to setup for the NLB | `list(map(string))` | n/a | yes |
+| <a name="input_name"></a> [name](#input\_name) | A descriptive name for this ELB | `any` | n/a | yes |
+| <a name="input_subnet_tags"></a> [subnet\_tags](#input\_subnet\_tags) | A map of tags used to filter the subnets you want the ELB attached | `map` | `{}` | no |
+| <a name="input_tags"></a> [tags](#input\_tags) | A map of tags which will be added to the ELB cloud tags, by default Name, Env and KubernetesCluster is added | `map` | `{}` | no |
+| <a name="input_unhealthy_threshold"></a> [unhealthy\_threshold](#input\_unhealthy\_threshold) | The number of consecutive health check failures required before considering the target unhealthy | `string` | `"3"` | no |
+| <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | The VPC id you are building the network load balancer in | `any` | n/a | yes |
 
 ## Outputs
 
 | Name | Description |
 |------|-------------|
-| dns |  |
-| nlb_arn |  |
-| nlb_dns_name |  |
-| nlb_id |  |
-| nlb_name |  |
-
+| <a name="output_dns"></a> [dns](#output\_dns) | The FQDN of the newly created ELB |
+| <a name="output_nlb_arn"></a> [nlb\_arn](#output\_nlb\_arn) | The AWS ARN of the NLB which has been created |
+| <a name="output_nlb_dns_name"></a> [nlb\_dns\_name](#output\_nlb\_dns\_name) | The name given to the ELB just created |
+| <a name="output_nlb_id"></a> [nlb\_id](#output\_nlb\_id) | The ID for the ELB which has been created |
+| <a name="output_nlb_name"></a> [nlb\_name](#output\_nlb\_name) | The name of the network load balancer we are creating |
+<!-- END_TF_DOCS -->
