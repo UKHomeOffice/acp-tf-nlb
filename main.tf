@@ -58,6 +58,7 @@ resource "aws_lb_target_group" "target_groups" {
 
   health_check {
     interval            = var.health_check_interval
+    port                = var.listeners[count.index]["target_port"]
     protocol            = "TCP"
     healthy_threshold   = var.healthy_threshold
     unhealthy_threshold = var.unhealthy_threshold
