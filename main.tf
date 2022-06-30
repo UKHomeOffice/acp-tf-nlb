@@ -55,6 +55,7 @@ resource "aws_lb_target_group" "target_groups" {
   port                 = var.listeners[count.index]["target_port"]
   protocol             = "TCP"
   vpc_id               = var.vpc_id
+  preserve_client_ip   = false
 
   health_check {
     interval            = var.health_check_interval
