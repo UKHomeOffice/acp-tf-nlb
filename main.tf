@@ -56,6 +56,7 @@ resource "aws_lb_target_group" "target_groups" {
   protocol             = "TCP"
   vpc_id               = var.vpc_id
   preserve_client_ip   = false
+  proxy_protocol_v2    = lookup(var.listeners[count.index], "proxy_protocol_v2", false)
 
   health_check {
     interval            = var.health_check_interval
