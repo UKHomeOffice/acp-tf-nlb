@@ -73,3 +73,7 @@ variable "unhealthy_threshold" {
 variable "vpc_id" {
   description = "The VPC id you are building the network load balancer in"
 }
+
+variable "clb_dns_current_record" {
+  description = "CLB dns record"
+}

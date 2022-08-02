@@ -132,6 +132,19 @@ resource "aws_route53_record" "dns" {
   zone_id = data.aws_route53_zone.selected.zone_id
   name    = var.dns_name == "" ? var.name : var.dns_name
   type    = var.dns_type
+  
+  alias {
+    name                   = aws_lb.balancer.dns_name
+    zone_id                = aws_lb.balancer.zone_id
+    evaluate_target_health = true
+  }
+}
+
+## Change existing CLB DNS entry to point to NLB
+resource "aws_route53_record" "clb_dns" {
+  zone_id = data.aws_route53_zone.selected.zone_id
+  name    = var.clb_dns_current_record
+  type    = var.dns_type
 
   alias {
     name                   = aws_lb.balancer.dns_name
