@@ -53,6 +53,7 @@ resource "aws_lb_target_group" "target_groups" {
   name                 = "${var.environment}-${var.name}-${var.listeners[count.index]["port"]}"
   deregistration_delay = var.deregistration_delay
   port                 = var.listeners[count.index]["target_port"]
+  preserve_client_ip   = var.preserve_client_ip
   protocol             = "TCP"
   vpc_id               = var.vpc_id
 
