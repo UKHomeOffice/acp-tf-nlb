@@ -74,7 +74,7 @@ variable "vpc_id" {
   description = "The VPC id you are building the network load balancer in"
 }
 
-variable "preserve_client_ip"
+variable "preserve_client_ip" {
   description = "Whether to preserve the client (source) IP - false will regard all traffic as originating from the eni, for example"
   default = true
 }
