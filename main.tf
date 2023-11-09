@@ -81,14 +81,14 @@ resource "aws_lb_target_group" "target_groups" {
 
 ## Attach the target groups to the autoscaling group
 resource "aws_autoscaling_attachment" "asg_attachment" {
-  for_each = flatten(
+  for_each = merge(flatten(
     [for nlb_port, target in var.listeners : {
       for asg_name in target["target_groups"] : "${nlb_port}-${target["target_port"]}-${asg_name}" => {
         asg_name           = asg_name
         target_group_index = nlb_port
       }
     }]
-  )
+  )...)
 
   autoscaling_group_name = each.value["asg_name"]
   alb_target_group_arn   = aws_lb_target_group.target_groups[each.value.target_group_index].arn
