@@ -30,8 +30,8 @@ variable "subnet_tags" {
   default     = {}
 }
 
-variable "listeners" {
-  description = "An array of listeners to setup for the NLB"
+variable "ports" {
+  description = "A map of ports and autoscaling groups to make listeners/target groups/ attachments from"
   type = map(object({
     target_port   = string
     target_groups = list(string)

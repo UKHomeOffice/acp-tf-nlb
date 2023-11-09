@@ -1,6 +1,4 @@
-<!-- BEGIN_TF_DOCS -->
-Module usage:
-
+## Usage
      module "nlb" {
        source         = "git::https://github.com/UKHomeOffice/acp-tf-nlb?ref=master"
 
@@ -16,20 +14,19 @@ Module usage:
          Role = "some\_tag"
        }
 
-       listeners = [
-         {
-           port         = "80"
-           target\_port  = "30200"
-           target\_group = "compute"
+       ports = {
+         "80" = {
+           target_port   = "8080"
+           target_groups = ["compute-az1", "compute-az2"]
          },
-         {
-           port         = "443"
-           target\_port  = "30201"
-           target\_group = "compute"
+         "443" = {
+           target_port   = "8443"
+           target_groups = ["compute-az1", "compute-az2]
          }
-       ]
+       }
      }
 
+<!-- BEGIN_TF_DOCS -->
 ## Requirements
 
 | Name | Version |
@@ -72,8 +69,9 @@ No modules.
 | <a name="input_healthy_threshold"></a> [healthy\_threshold](#input\_healthy\_threshold) | The number of consecutive health checks successes required before considering an unhealthy target healthy | `string` | `"3"` | no |
 | <a name="input_idle_timeout"></a> [idle\_timeout](#input\_idle\_timeout) | The timeout applie to idle ELB connections | `string` | `"120"` | no |
 | <a name="input_internal"></a> [internal](#input\_internal) | Indicates if the ELB should be an internal load balancer, defaults to true | `bool` | `true` | no |
-| <a name="input_listeners"></a> [listeners](#input\_listeners) | An array of listeners to setup for the NLB | `list(map(string))` | n/a | yes |
 | <a name="input_name"></a> [name](#input\_name) | A descriptive name for this ELB | `any` | n/a | yes |
+| <a name="input_ports"></a> [ports](#input\_ports) | A map of ports and autoscaling groups to make listeners/target groups/ attachments from | <pre>map(object({<br>    target_port   = string<br>    target_groups = list(string)<br>  }))</pre> | n/a | yes |
+| <a name="input_preserve_client_ip"></a> [preserve\_client\_ip](#input\_preserve\_client\_ip) | Whether to preserve the client (source) IP - false will regard all traffic as originating from the eni, for example | `bool` | `true` | no |
 | <a name="input_subnet_tags"></a> [subnet\_tags](#input\_subnet\_tags) | A map of tags used to filter the subnets you want the ELB attached | `map` | `{}` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | A map of tags which will be added to the ELB cloud tags, by default Name, Env and KubernetesCluster is added | `map` | `{}` | no |
 | <a name="input_unhealthy_threshold"></a> [unhealthy\_threshold](#input\_unhealthy\_threshold) | The number of consecutive health check failures required before considering the target unhealthy | `string` | `"3"` | no |
