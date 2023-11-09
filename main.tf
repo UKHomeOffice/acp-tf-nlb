@@ -48,18 +48,18 @@ data "aws_route53_zone" "selected" {
 
 ## Create a listen and target group for each of the listeners
 resource "aws_lb_target_group" "target_groups" {
-  count = length(var.listeners)
+  for_each = var.listeners
 
-  name                 = "${var.environment}-${var.name}-${var.listeners[count.index]["port"]}"
+  name                 = "${var.environment}-${var.name}-${each.key}"
   deregistration_delay = var.deregistration_delay
-  port                 = var.listeners[count.index]["target_port"]
+  port                 = each.value["target_port"]
   preserve_client_ip   = var.preserve_client_ip
   protocol             = "TCP"
   vpc_id               = var.vpc_id
 
   health_check {
     interval            = var.health_check_interval
-    port                = var.listeners[count.index]["target_port"]
+    port                = each.value["target_port"]
     protocol            = "TCP"
     healthy_threshold   = var.healthy_threshold
     unhealthy_threshold = var.unhealthy_threshold
@@ -81,24 +81,31 @@ resource "aws_lb_target_group" "target_groups" {
 
 ## Attach the target groups to the autoscaling group
 resource "aws_autoscaling_attachment" "asg_attachment" {
-  count = length(var.listeners)
+  for_each = flatten(
+    [for nlb_port, target in var.listener : {
+      for asg_name in target["target_groups"] : "${nlb_port}-${target["target_port"]}-${asg_name}" => {
+        asg_name           = asg_name
+        target_group_index = nlb_port
+      }
+    }]
+  )
 
-  autoscaling_group_name = var.listeners[count.index]["target_group"]
-  alb_target_group_arn   = element(aws_lb_target_group.target_groups.*.arn, count.index)
+  autoscaling_group_name = each.value["asg_name"]
+  alb_target_group_arn   = aws_lb_target_group.target_groups[each.value.target_group_index].arn
 }
 
 ## Create the listener for the target group - this is a bit of a crap way of doing things,
 ## surely it makes more sense to a listener to have a source and destination port and then use a single
 ## target group? .. but hey
 resource "aws_lb_listener" "listeners" {
-  count = length(var.listeners)
+  for_each = var.listeners
 
   load_balancer_arn = aws_lb.balancer.arn
-  port              = var.listeners[count.index]["port"]
+  port              = each.key
   protocol          = "TCP"
 
   default_action {
-    target_group_arn = element(aws_lb_target_group.target_groups.*.arn, count.index)
+    target_group_arn = aws_lb_target_group.target_groups[each.key].arn
     type             = "forward"
   }
 }

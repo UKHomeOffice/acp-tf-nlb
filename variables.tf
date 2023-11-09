@@ -32,7 +32,10 @@ variable "subnet_tags" {
 
 variable "listeners" {
   description = "An array of listeners to setup for the NLB"
-  type        = list(map(string))
+  type = map(object({
+    target_port   = string
+    target_groups = list(string)
+  }))
 }
 
 variable "tags" {
@@ -76,5 +79,5 @@ variable "vpc_id" {
 
 variable "preserve_client_ip" {
   description = "Whether to preserve the client (source) IP - false will regard all traffic as originating from the eni, for example"
-  default = true
+  default     = true
 }
