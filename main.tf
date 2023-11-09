@@ -1,5 +1,5 @@
 resource "aws_lb_target_group" "target_groups" {
-  for_each = var.listeners
+  for_each = var.ports
 
   name                 = "${var.environment}-${var.name}-${each.key}"
   deregistration_delay = var.deregistration_delay
@@ -50,7 +50,7 @@ resource "aws_autoscaling_attachment" "asg_attachment" {
     target_group_index, the index of the target group to attach to
   */
   for_each = merge(flatten(
-    [for nlb_port, target in var.listeners : {
+    [for nlb_port, target in var.ports : {
       for asg_name in target["target_groups"] : "${nlb_port}-${target["target_port"]}-${asg_name}" => {
         asg_name           = asg_name
         target_group_index = nlb_port
@@ -63,7 +63,7 @@ resource "aws_autoscaling_attachment" "asg_attachment" {
 }
 
 resource "aws_lb_listener" "listeners" {
-  for_each = var.listeners
+  for_each = var.ports
 
   load_balancer_arn = aws_lb.balancer.arn
   port              = each.key
