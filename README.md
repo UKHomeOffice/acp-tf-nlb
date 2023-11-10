@@ -1,6 +1,6 @@
 ## Changelogs
 
-v2.0.0 - Breaking changes, renaming var.listeners to var.ports and turns it into an map(object) which uses the ports as indexes so doesn't cause the terraform index shift recreation issue and also accepts multiple target groups
+v2.0.0 - Breaking changes, renaming var.listeners to var.ports and turns it into an map(object) which uses the ports as indexes so doesn't cause the Terraform index shift recreation issue and also accepts multiple target groups
 
 v1.0.5 - Adds support for the boolean argument 'preserve_client_ip'
 
