@@ -1,65 +1,16 @@
-/**
- * Module usage:
- *
- *      module "nlb" {
- *        source         = "git::https://github.com/UKHomeOffice/acp-tf-nlb?ref=master"
- *
- *        name            = "my-service"
- *        environment     = "dev"            # by default both Name and Env is added to the tags
- *        dns_zone        = "example.com"
- *        vpc_id          = "vpc-32323232"
- *        tags            = {
- *          Role = "some_tag"
- *        }
- *        # A series of tags applied to filter out the source subnets, by default Env and Role = elb-subnet is used
- *        subnet_tags {
- *          Role = "some_tag"
- *        }
- *
- *        listeners = [
- *          {
- *            port         = "80"
- *            target_port  = "30200"
- *            target_group = "compute"
- *          },
- *          {
- *            port         = "443"
- *            target_port  = "30201"
- *            target_group = "compute"
- *          }
- *        ]
- *      }
- *
- */
-terraform {
-  required_version = ">= 1.0"
-}
-
-# Get a list of ELB subnets
-data "aws_subnet_ids" "selected" {
-  vpc_id = var.vpc_id
-  tags   = var.subnet_tags
-}
-
-# Get the host zone id
-data "aws_route53_zone" "selected" {
-  name = "${var.dns_zone}."
-}
-
-## Create a listen and target group for each of the listeners
 resource "aws_lb_target_group" "target_groups" {
-  count = length(var.listeners)
+  for_each = var.ports
 
-  name                 = "${var.environment}-${var.name}-${var.listeners[count.index]["port"]}"
+  name                 = "${var.environment}-${var.name}-${each.key}"
   deregistration_delay = var.deregistration_delay
-  port                 = var.listeners[count.index]["target_port"]
+  port                 = each.value["target_port"]
   preserve_client_ip   = var.preserve_client_ip
   protocol             = "TCP"
   vpc_id               = var.vpc_id
 
   health_check {
     interval            = var.health_check_interval
-    port                = var.listeners[count.index]["target_port"]
+    port                = each.value["target_port"]
     protocol            = "TCP"
     healthy_threshold   = var.healthy_threshold
     unhealthy_threshold = var.unhealthy_threshold
@@ -79,31 +30,51 @@ resource "aws_lb_target_group" "target_groups" {
   )
 }
 
-## Attach the target groups to the autoscaling group
 resource "aws_autoscaling_attachment" "asg_attachment" {
-  count = length(var.listeners)
+  /*
+  Terraform maps are notoriously difficult to follow, but unfortunately this was the only way to have a coherent input to the module.
+  Assumptions:
+  1. We need to use a map so that when the list is modified only the ones changed get touched (i.e what would happenw with a list is that if you remove an item, everything after it would get shifted left and recreated).
+  2. There is one attachment per ASG per targetgroup
 
-  autoscaling_group_name = var.listeners[count.index]["target_group"]
-  alb_target_group_arn   = element(aws_lb_target_group.target_groups.*.arn, count.index)
+  What this does is returns a map of type map(object( asg_name = string, target_group_index = string))
+  With the Key of the map being the unique key of the attachment e.g
+  {
+    "$NLBPORT-$NODEPORT-$ASGNAME" = {
+        asg_name           = $ASGNAME
+        target_group_index = $NLBPORT
+    }
+  }
+  The map key "$NLBPORT-$NODEPORT-$ASGNAME" is needed as each attachment needs to be unique
+    asg_name, the name of the ASG to attach
+    target_group_index, the index of the target group to attach to
+  */
+  for_each = merge(flatten(
+    [for nlb_port, target in var.ports : {
+      for asg_name in target["target_groups"] : "${nlb_port}-${target["target_port"]}-${asg_name}" => {
+        asg_name           = asg_name
+        target_group_index = nlb_port
+      }
+    }]
+  )...)
+
+  autoscaling_group_name = each.value["asg_name"]
+  alb_target_group_arn   = aws_lb_target_group.target_groups[each.value.target_group_index].arn
 }
 
-## Create the listener for the target group - this is a bit of a crap way of doing things,
-## surely it makes more sense to a listener to have a source and destination port and then use a single
-## target group? .. but hey
 resource "aws_lb_listener" "listeners" {
-  count = length(var.listeners)
+  for_each = var.ports
 
   load_balancer_arn = aws_lb.balancer.arn
-  port              = var.listeners[count.index]["port"]
+  port              = each.key
   protocol          = "TCP"
 
   default_action {
-    target_group_arn = element(aws_lb_target_group.target_groups.*.arn, count.index)
+    target_group_arn = aws_lb_target_group.target_groups[each.key].arn
     type             = "forward"
   }
 }
 
-## The ALB we are creating
 resource "aws_lb" "balancer" {
   name = "${var.environment}-${var.name}-nlb"
 
@@ -126,7 +97,6 @@ resource "aws_lb" "balancer" {
   )
 }
 
-## Create a DNS entry for this NLB
 resource "aws_route53_record" "dns" {
   zone_id = data.aws_route53_zone.selected.zone_id
   name    = var.dns_name == "" ? var.name : var.dns_name
