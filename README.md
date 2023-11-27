@@ -1,7 +1,7 @@
 ## Changelogs
 
+v2.1.0 - Added mandatory ingress cidr range variable for the security group
 v2.0.0 - Breaking changes, renaming var.listeners to var.ports and turns it into an map(object) which uses the ports as indexes so doesn't cause the Terraform index shift recreation issue and also accepts multiple target groups
-
 v1.0.5 - Adds support for the boolean argument 'preserve_client_ip'
 
 
@@ -59,6 +59,9 @@ No modules.
 | [aws_lb_listener.listeners](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener) | resource |
 | [aws_lb_target_group.target_groups](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_target_group) | resource |
 | [aws_route53_record.dns](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record) | resource |
+| [aws_security_group.balancer](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
+| [aws_security_group_rule.egress](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
+| [aws_security_group_rule.ingress](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
 | [aws_route53_zone.selected](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/route53_zone) | data source |
 | [aws_subnet_ids.selected](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/subnet_ids) | data source |
 
@@ -66,6 +69,7 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_cidr_blocks"></a> [cidr\_blocks](#input\_cidr\_blocks) | CIDR ranges to allow access to this NLB | `list(string)` | n/a | yes |
 | <a name="input_deregistration_delay"></a> [deregistration\_delay](#input\_deregistration\_delay) | The amount time for Elastic Load Balancing to wait before changing the state of a deregistering target from draining to unused | `string` | `"300"` | no |
 | <a name="input_dns_name"></a> [dns\_name](#input\_dns\_name) | An optional hostname to add to the hosting zone, otherwise defaults to var.name | `string` | `""` | no |
 | <a name="input_dns_type"></a> [dns\_type](#input\_dns\_type) | The dns record type to use when adding the dns entry | `string` | `"A"` | no |
