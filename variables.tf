@@ -81,3 +81,8 @@ variable "preserve_client_ip" {
   description = "Whether to preserve the client (source) IP - false will regard all traffic as originating from the eni, for example"
   default     = true
 }
+
+variable "cidr_blocks" {
+  description = "CIDR ranges to allow access to this NLB"
+  type        = list(string)
+}

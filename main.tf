@@ -1,3 +1,28 @@
+resource "aws_security_group" "balancer" {
+  name        = "nlb-${var.name}-sg-rds"
+  description = "The security group used to manage access to NLB: ${var.name}"
+  vpc_id      = var.vpc_id
+  tags        = var.tags
+}
+
+resource "aws_security_group_rule" "ingress" {
+  type              = "ingress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "tcp"
+  cidr_blocks       = var.cidr_blocks
+  security_group_id = aws_security_group.balancer.id
+}
+
+resource "aws_security_group_rule" "egress" {
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.balancer.id
+}
+
 resource "aws_lb_target_group" "target_groups" {
   for_each = var.ports
 
@@ -82,6 +107,7 @@ resource "aws_lb" "balancer" {
   internal                         = var.internal
   load_balancer_type               = "network"
   subnets                          = data.aws_subnet_ids.selected.ids
+  security_groups                  = [aws_security_group.balancer.id]
 
   tags = merge(
     var.tags,
