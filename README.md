@@ -4,8 +4,12 @@ v3.0.0
 - (breaking change) var.subnet_tags removed instead to use hard coded var.subnet_ids
 - (breaking change) added mandatory var.security_groups_ingress_cidr to allow for optional CIDR range for SG's
 - Optional disable_security_groups to allow for backwards compatability
-v2.0.0 - Breaking changes, renaming var.listeners to var.ports and turns it into an map(object) which uses the ports as indexes so doesn't cause the Terraform index shift recreation issue and also accepts multiple target groups
-v1.0.5 - Adds support for the boolean argument 'preserve_client_ip'
+  
+v2.0.0 
+- (breaking changes) renaming var.listeners to var.ports and turns it into an map(object) which uses the ports as indexes so doesn't cause the Terraform index shift recreation issue and also accepts multiple target groups
+
+v1.0.5 
+- Adds support for the boolean argument 'preserve_client_ip'
 
 ## Usage
      module "nlb" {
