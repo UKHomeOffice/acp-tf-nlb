@@ -1,6 +1,9 @@
-## Changelogs
+## Changelog
 
-v2.1.0 - Added mandatory ingress cidr range variable for the security group
+v3.0.0 
+- (breaking change) var.subnet_tags removed instead to use hard coded var.subnet_ids
+- (breaking change) added mandatory var.security_groups_ingress_cidr to allow for optional CIDR range for SG's
+- Optional disable_security_groups to allow for backwards compatability
 v2.0.0 - Breaking changes, renaming var.listeners to var.ports and turns it into an map(object) which uses the ports as indexes so doesn't cause the Terraform index shift recreation issue and also accepts multiple target groups
 v1.0.5 - Adds support for the boolean argument 'preserve_client_ip'
 
@@ -63,14 +66,13 @@ No modules.
 | [aws_security_group_rule.egress](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
 | [aws_security_group_rule.ingress](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
 | [aws_route53_zone.selected](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/route53_zone) | data source |
-| [aws_subnet_ids.selected](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/subnet_ids) | data source |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_cidr_blocks"></a> [cidr\_blocks](#input\_cidr\_blocks) | CIDR ranges to allow access to this NLB | `list(string)` | n/a | yes |
 | <a name="input_deregistration_delay"></a> [deregistration\_delay](#input\_deregistration\_delay) | The amount time for Elastic Load Balancing to wait before changing the state of a deregistering target from draining to unused | `string` | `"300"` | no |
+| <a name="input_disable_security_groups"></a> [disable\_security\_groups](#input\_disable\_security\_groups) | Disable SecurityGroup creation, this is for backwards compatability as SG's can't be added after creation | `bool` | `false` | no |
 | <a name="input_dns_name"></a> [dns\_name](#input\_dns\_name) | An optional hostname to add to the hosting zone, otherwise defaults to var.name | `string` | `""` | no |
 | <a name="input_dns_type"></a> [dns\_type](#input\_dns\_type) | The dns record type to use when adding the dns entry | `string` | `"A"` | no |
 | <a name="input_dns_zone"></a> [dns\_zone](#input\_dns\_zone) | The AWS route53 domain name hosting the dns entry, i.e. example.com | `any` | n/a | yes |
@@ -83,7 +85,8 @@ No modules.
 | <a name="input_name"></a> [name](#input\_name) | A descriptive name for this ELB | `any` | n/a | yes |
 | <a name="input_ports"></a> [ports](#input\_ports) | A map of ports and autoscaling groups to make listeners/target groups/ attachments from | <pre>map(object({<br>    target_port   = string<br>    target_groups = list(string)<br>  }))</pre> | n/a | yes |
 | <a name="input_preserve_client_ip"></a> [preserve\_client\_ip](#input\_preserve\_client\_ip) | Whether to preserve the client (source) IP - false will regard all traffic as originating from the eni, for example | `bool` | `true` | no |
-| <a name="input_subnet_tags"></a> [subnet\_tags](#input\_subnet\_tags) | A map of tags used to filter the subnets you want the ELB attached | `map` | `{}` | no |
+| <a name="input_security_group_ingress_cidr"></a> [security\_group\_ingress\_cidr](#input\_security\_group\_ingress\_cidr) | CIDR ranges to allow access to this NLB | `list(string)` | n/a | yes |
+| <a name="input_subnet_ids"></a> [subnet\_ids](#input\_subnet\_ids) | A list of subnet id's to be used for the NLB | `any` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | A map of tags which will be added to the ELB cloud tags, by default Name, Env and KubernetesCluster is added | `map` | `{}` | no |
 | <a name="input_unhealthy_threshold"></a> [unhealthy\_threshold](#input\_unhealthy\_threshold) | The number of consecutive health check failures required before considering the target unhealthy | `string` | `"3"` | no |
 | <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | The VPC id you are building the network load balancer in | `any` | n/a | yes |

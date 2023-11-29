@@ -25,9 +25,8 @@ variable "elb_role_tag" {
   default     = "elb-subnets"
 }
 
-variable "subnet_tags" {
-  description = "A map of tags used to filter the subnets you want the ELB attached"
-  default     = {}
+variable "subnet_ids" {
+  description = "A list of subnet id's to be used for the NLB"
 }
 
 variable "ports" {
@@ -82,7 +81,12 @@ variable "preserve_client_ip" {
   default     = true
 }
 
-variable "cidr_blocks" {
+variable "security_group_ingress_cidr" {
   description = "CIDR ranges to allow access to this NLB"
   type        = list(string)
+}
+
+variable "disable_security_groups" {
+  description = "Disable SecurityGroup creation, this is for backwards compatability as SG's can't be added after creation"
+  default     = false
 }
