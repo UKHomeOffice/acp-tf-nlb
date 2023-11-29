@@ -1,26 +1,41 @@
 resource "aws_security_group" "balancer" {
+  count       = var.disable_security_groups ? 0 : 1
   name        = "nlb-${var.name}-sg-rds"
   description = "The security group used to manage access to NLB: ${var.name}"
   vpc_id      = var.vpc_id
-  tags        = var.tags
+
+  tags = merge(
+    var.tags,
+    {
+      "Name" = format("%s-%s-nlb", var.environment, var.name)
+    },
+    {
+      "Env" = var.environment
+    },
+    {
+      "KubernetesCluster" = var.environment
+    },
+  )
 }
 
 resource "aws_security_group_rule" "ingress" {
+  count             = var.disable_security_groups ? 0 : 1
   type              = "ingress"
   from_port         = 0
   to_port           = 0
   protocol          = "tcp"
-  cidr_blocks       = var.cidr_blocks
-  security_group_id = aws_security_group.balancer.id
+  cidr_blocks       = var.security_group_ingress_cidr
+  security_group_id = aws_security_group.balancer[0].id
 }
 
 resource "aws_security_group_rule" "egress" {
+  count             = var.disable_security_groups ? 0 : 1
   type              = "egress"
   from_port         = 0
   to_port           = 0
   protocol          = "-1"
   cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.balancer.id
+  security_group_id = aws_security_group.balancer[0].id
 }
 
 resource "aws_lb_target_group" "target_groups" {
@@ -106,8 +121,8 @@ resource "aws_lb" "balancer" {
   enable_cross_zone_load_balancing = "true"
   internal                         = var.internal
   load_balancer_type               = "network"
-  subnets                          = data.aws_subnet_ids.selected.ids
-  security_groups                  = [aws_security_group.balancer.id]
+  subnets                          = var.subnet_ids
+  security_groups                  = var.disable_security_groups ? null : [aws_security_group.balancer[0].id] # Disable for backwards compatability with version 2 of this module
 
   tags = merge(
     var.tags,
