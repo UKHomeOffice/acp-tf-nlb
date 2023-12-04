@@ -46,6 +46,7 @@ resource "aws_lb_target_group" "target_groups" {
   port                 = each.value["target_port"]
   preserve_client_ip   = var.preserve_client_ip
   protocol             = "TCP"
+  proxy_protocol_v2    = lookup(var.listeners[count.index], "proxy_protocol_v2", false)
   vpc_id               = var.vpc_id
 
   health_check {
