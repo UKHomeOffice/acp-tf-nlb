@@ -121,7 +121,13 @@ resource "aws_lb" "balancer" {
   enable_cross_zone_load_balancing = "true"
   internal                         = var.internal
   load_balancer_type               = "network"
-  subnets                          = var.subnet_ids
+  dynamic "subnet_mapping" {
+    for_each = var.subnet_mappings
+    content {
+      subnet_id = subnet_mapping.subnet_id
+      private_ipv4_address = subnet_mapping.private_ipv4_address
+    }
+  }
   security_groups                  = var.disable_security_groups ? null : [aws_security_group.balancer[0].id] # Disable for backwards compatability with version 2 of this module
 
   tags = merge(

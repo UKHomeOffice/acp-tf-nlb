@@ -90,3 +90,11 @@ variable "disable_security_groups" {
   description = "Disable SecurityGroup creation, this is for backwards compatability as SG's can't be added after creation"
   default     = false
 }
+
+variable "subnet_mappings" {
+  type = map(object({
+    subnet_id  = string,
+    private_ipv4_address = string
+  }))
+  default = {}
+}
