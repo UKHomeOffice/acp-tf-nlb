@@ -105,7 +105,7 @@ resource "aws_autoscaling_attachment" "asg_attachment" {
 resource "aws_lb_listener" "listeners" {
   for_each = var.ports
 
-  load_balancer_arn = aws_lb.balancer.arn
+  load_balancer_arn = var.use_nlb_internal_subnet_mappings ? aws_lb.balancer_int_with_subnet_mappings[0].arn : aws_lb.balancer[0].arn
   port              = each.key
   protocol          = "TCP"
 
@@ -116,7 +116,8 @@ resource "aws_lb_listener" "listeners" {
 }
 
 resource "aws_lb" "balancer" {
-  name = "${var.environment}-${var.name}-nlb"
+  count = var.use_nlb_internal_subnet_mappings ? 0 : 1
+  name  = "${var.environment}-${var.name}-nlb"
 
   enable_cross_zone_load_balancing = "true"
   internal                         = var.internal
@@ -138,14 +139,44 @@ resource "aws_lb" "balancer" {
   )
 }
 
+resource "aws_lb" "balancer_int_with_subnet_mappings" {
+  count = var.use_nlb_internal_subnet_mappings ? 1 : 0
+  name  = "${var.environment}-${var.name}-nlb"
+
+  enable_cross_zone_load_balancing = "true"
+  internal                         = "true"
+  load_balancer_type               = "network"
+  dynamic "subnet_mapping" {
+    for_each = var.subnet_mappings
+    content {
+      subnet_id            = subnet_mapping.value.subnet_id
+      private_ipv4_address = subnet_mapping.value.private_ipv4_address
+    }
+  }
+  security_groups = var.disable_security_groups ? null : [aws_security_group.balancer[0].id] # Disable for backwards compatability with version 2 of this module
+
+  tags = merge(
+    var.tags,
+    {
+      "Name" = format("%s-%s", var.environment, var.name)
+    },
+    {
+      "Env" = var.environment
+    },
+    {
+      "KubernetesCluster" = var.environment
+    },
+  )
+}
+
 resource "aws_route53_record" "dns" {
   zone_id = data.aws_route53_zone.selected.zone_id
   name    = var.dns_name == "" ? var.name : var.dns_name
   type    = var.dns_type
 
   alias {
-    name                   = aws_lb.balancer.dns_name
-    zone_id                = aws_lb.balancer.zone_id
+    name                   = var.use_nlb_internal_subnet_mappings ? aws_lb.balancer_int_with_subnet_mappings[0].dns_name : aws_lb.balancer[0].dns_name
+    zone_id                = var.use_nlb_internal_subnet_mappings ? aws_lb.balancer_int_with_subnet_mappings[0].zone_id : aws_lb.balancer[0].zone_id
     evaluate_target_health = true
   }
 }

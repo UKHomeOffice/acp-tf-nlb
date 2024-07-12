@@ -5,12 +5,12 @@ output "dns" {
 
 output "nlb_id" {
   description = "The ID for the ELB which has been created"
-  value       = aws_lb.balancer.id
+  value       = var.use_nlb_internal_subnet_mappings ? aws_lb.balancer_int_with_subnet_mappings[0].id : aws_lb.balancer[0].id
 }
 
 output "nlb_arn" {
   description = "The AWS ARN of the NLB which has been created"
-  value       = aws_lb.balancer.arn
+  value       = var.use_nlb_internal_subnet_mappings ? aws_lb.balancer_int_with_subnet_mappings[0].arn : aws_lb.balancer[0].arn
 }
 
 output "nlb_name" {
@@ -20,6 +20,6 @@ output "nlb_name" {
 
 output "nlb_dns_name" {
   description = "The name given to the ELB just created"
-  value       = aws_lb.balancer.dns_name
+  value       = var.use_nlb_internal_subnet_mappings ? aws_lb.balancer_int_with_subnet_mappings[0].dns_name : aws_lb.balancer[0].dns_name
 }
 
