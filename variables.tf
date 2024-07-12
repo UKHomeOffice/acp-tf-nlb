@@ -91,9 +91,14 @@ variable "disable_security_groups" {
   default     = false
 }
 
+variable "use_nlb_internal_subnet_mappings" {
+  description = "Boolean flag to conditionally use subnet mappings to specify private IP addresses for internal facing NLB"
+  default     = false
+}
+
 variable "subnet_mappings" {
   type = map(object({
-    subnet_id  = string,
+    subnet_id            = string,
     private_ipv4_address = string
   }))
   default = {}

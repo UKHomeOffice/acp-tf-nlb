@@ -116,19 +116,44 @@ resource "aws_lb_listener" "listeners" {
 }
 
 resource "aws_lb" "balancer" {
-  name = "${var.environment}-${var.name}-nlb"
+  count = var.use_nlb_internal_subnet_mappings ? 0 : 1
+  name  = "${var.environment}-${var.name}-nlb"
 
   enable_cross_zone_load_balancing = "true"
   internal                         = var.internal
   load_balancer_type               = "network"
+  subnets                          = var.subnet_ids
+  security_groups                  = var.disable_security_groups ? null : [aws_security_group.balancer[0].id] # Disable for backwards compatability with version 2 of this module
+
+  tags = merge(
+    var.tags,
+    {
+      "Name" = format("%s-%s", var.environment, var.name)
+    },
+    {
+      "Env" = var.environment
+    },
+    {
+      "KubernetesCluster" = var.environment
+    },
+  )
+}
+
+resource "aws_lb" "balancer_int_with_subnet_mappings" {
+  count = var.use_nlb_internal_subnet_mappings ? 1 : 0
+  name  = "${var.environment}-${var.name}-nlb"
+
+  enable_cross_zone_load_balancing = "true"
+  internal                         = "true"
+  load_balancer_type               = "network"
   dynamic "subnet_mapping" {
     for_each = var.subnet_mappings
     content {
-      subnet_id = subnet_mapping.value.subnet_id
+      subnet_id            = subnet_mapping.value.subnet_id
       private_ipv4_address = subnet_mapping.value.private_ipv4_address
     }
   }
-  security_groups                  = var.disable_security_groups ? null : [aws_security_group.balancer[0].id] # Disable for backwards compatability with version 2 of this module
+  security_groups = var.disable_security_groups ? null : [aws_security_group.balancer[0].id] # Disable for backwards compatability with version 2 of this module
 
   tags = merge(
     var.tags,
