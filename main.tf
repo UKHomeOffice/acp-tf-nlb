@@ -105,7 +105,7 @@ resource "aws_autoscaling_attachment" "asg_attachment" {
 resource "aws_lb_listener" "listeners" {
   for_each = var.ports
 
-  load_balancer_arn = aws_lb.balancer.arn
+  load_balancer_arn = var.use_nlb_internal_subnet_mappings ? aws_lb.balancer_int_with_subnet_mappings[0].arn : aws_lb.balancer[0].arn
   port              = each.key
   protocol          = "TCP"
 
@@ -175,8 +175,8 @@ resource "aws_route53_record" "dns" {
   type    = var.dns_type
 
   alias {
-    name                   = aws_lb.balancer.dns_name
-    zone_id                = aws_lb.balancer.zone_id
+    name                   = var.use_nlb_internal_subnet_mappings ? aws_lb.balancer_int_with_subnet_mappings[0].dns_name : aws_lb.balancer[0].dns_name
+    zone_id                = var.use_nlb_internal_subnet_mappings ? aws_lb.balancer_int_with_subnet_mappings[0].zone_id : aws_lb.balancer[0].zone_id
     evaluate_target_health = true
   }
 }
