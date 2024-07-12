@@ -124,8 +124,8 @@ resource "aws_lb" "balancer" {
   dynamic "subnet_mapping" {
     for_each = var.subnet_mappings
     content {
-      subnet_id = subnet_mapping.subnet_id
-      private_ipv4_address = subnet_mapping.private_ipv4_address
+      subnet_id = subnet_mapping.value.subnet_id
+      private_ipv4_address = subnet_mapping.value.private_ipv4_address
     }
   }
   security_groups                  = var.disable_security_groups ? null : [aws_security_group.balancer[0].id] # Disable for backwards compatability with version 2 of this module
