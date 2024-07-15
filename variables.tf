@@ -27,6 +27,7 @@ variable "elb_role_tag" {
 
 variable "subnet_ids" {
   description = "A list of subnet id's to be used for the NLB"
+  default = []
 }
 
 variable "ports" {
@@ -89,4 +90,12 @@ variable "security_group_ingress_cidr" {
 variable "disable_security_groups" {
   description = "Disable SecurityGroup creation, this is for backwards compatability as SG's can't be added after creation"
   default     = false
+}
+
+variable "internal_nlb_subnet_mappings" {
+  type = map(object({
+    subnet_id            = string,
+    private_ipv4_address = string
+  }))
+  default = {}
 }

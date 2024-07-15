@@ -119,9 +119,18 @@ resource "aws_lb" "balancer" {
   name = "${var.environment}-${var.name}-nlb"
 
   enable_cross_zone_load_balancing = "true"
-  internal                         = var.internal
+  internal                         = length(var.internal_nlb_subnet_mappings) > 0 ? true : var.internal
   load_balancer_type               = "network"
-  subnets                          = var.subnet_ids
+  subnets                          = length(var.internal_nlb_subnet_mappings) > 0 ? null : var.subnet_ids
+
+  dynamic "subnet_mapping" {
+    for_each = var.internal_nlb_subnet_mappings
+    content {
+      subnet_id            = subnet_mapping.value.subnet_id
+      private_ipv4_address = subnet_mapping.value.private_ipv4_address
+    }
+  }
+
   security_groups                  = var.disable_security_groups ? null : [aws_security_group.balancer[0].id] # Disable for backwards compatability with version 2 of this module
 
   tags = merge(
