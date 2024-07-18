@@ -19,7 +19,6 @@ resource "aws_security_group" "balancer" {
 }
 
 resource "aws_security_group_rule" "ingress" {
-  count             = var.disable_security_groups ? 0 : 1
   for_each          = var.disable_security_groups ? [] : var.ports
   type              = "ingress"
   from_port         = each.key
