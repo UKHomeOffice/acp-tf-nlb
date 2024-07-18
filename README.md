@@ -85,11 +85,12 @@ No modules.
 | <a name="input_healthy_threshold"></a> [healthy\_threshold](#input\_healthy\_threshold) | The number of consecutive health checks successes required before considering an unhealthy target healthy | `string` | `"3"` | no |
 | <a name="input_idle_timeout"></a> [idle\_timeout](#input\_idle\_timeout) | The timeout applie to idle ELB connections | `string` | `"120"` | no |
 | <a name="input_internal"></a> [internal](#input\_internal) | Indicates if the ELB should be an internal load balancer, defaults to true | `bool` | `true` | no |
+| <a name="input_internal_nlb_subnet_mappings"></a> [internal\_nlb\_subnet\_mappings](#input\_internal\_nlb\_subnet\_mappings) | n/a | <pre>map(object({<br>    subnet_id            = string,<br>    private_ipv4_address = string<br>  }))</pre> | `{}` | no |
 | <a name="input_name"></a> [name](#input\_name) | A descriptive name for this ELB | `any` | n/a | yes |
 | <a name="input_ports"></a> [ports](#input\_ports) | A map of ports and autoscaling groups to make listeners/target groups/ attachments from | <pre>map(object({<br>    target_port   = string<br>    target_groups = list(string)<br>  }))</pre> | n/a | yes |
 | <a name="input_preserve_client_ip"></a> [preserve\_client\_ip](#input\_preserve\_client\_ip) | Whether to preserve the client (source) IP - false will regard all traffic as originating from the eni, for example | `bool` | `true` | no |
 | <a name="input_security_group_ingress_cidr"></a> [security\_group\_ingress\_cidr](#input\_security\_group\_ingress\_cidr) | CIDR ranges to allow access to this NLB | `list(string)` | n/a | yes |
-| <a name="input_subnet_ids"></a> [subnet\_ids](#input\_subnet\_ids) | A list of subnet id's to be used for the NLB | `any` | n/a | yes |
+| <a name="input_subnet_ids"></a> [subnet\_ids](#input\_subnet\_ids) | A list of subnet id's to be used for the NLB | `list` | `[]` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | A map of tags which will be added to the ELB cloud tags, by default Name, Env and KubernetesCluster is added | `map` | `{}` | no |
 | <a name="input_unhealthy_threshold"></a> [unhealthy\_threshold](#input\_unhealthy\_threshold) | The number of consecutive health check failures required before considering the target unhealthy | `string` | `"3"` | no |
 | <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | The VPC id you are building the network load balancer in | `any` | n/a | yes |

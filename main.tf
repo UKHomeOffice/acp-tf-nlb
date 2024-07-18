@@ -19,10 +19,14 @@ resource "aws_security_group" "balancer" {
 }
 
 resource "aws_security_group_rule" "ingress" {
-  count             = var.disable_security_groups ? 0 : 1
+  for_each = {
+    for key, value in var.ports : key => value
+    if var.disable_security_groups == false
+  }
+
   type              = "ingress"
-  from_port         = 0
-  to_port           = 0
+  from_port         = each.key
+  to_port           = each.key
   protocol          = "tcp"
   cidr_blocks       = var.security_group_ingress_cidr
   security_group_id = aws_security_group.balancer[0].id
@@ -131,7 +135,7 @@ resource "aws_lb" "balancer" {
     }
   }
 
-  security_groups                  = var.disable_security_groups ? null : [aws_security_group.balancer[0].id] # Disable for backwards compatability with version 2 of this module
+  security_groups = var.disable_security_groups ? null : [aws_security_group.balancer[0].id] # Disable for backwards compatability with version 2 of this module
 
   tags = merge(
     var.tags,
