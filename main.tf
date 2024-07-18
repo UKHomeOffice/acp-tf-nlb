@@ -19,7 +19,11 @@ resource "aws_security_group" "balancer" {
 }
 
 resource "aws_security_group_rule" "ingress" {
-  for_each          = var.ports
+  for_each          = {
+    for key, value in var.ports : key => value
+    if length(var.disable_security_groups) < 1
+  }
+  
   type              = "ingress"
   from_port         = each.key
   to_port           = each.key
