@@ -27,7 +27,7 @@ variable "elb_role_tag" {
 
 variable "subnet_ids" {
   description = "A list of subnet id's to be used for the NLB"
-  default = []
+  default     = []
 }
 
 variable "ports" {

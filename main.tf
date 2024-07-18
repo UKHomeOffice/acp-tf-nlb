@@ -19,7 +19,7 @@ resource "aws_security_group" "balancer" {
 }
 
 resource "aws_security_group_rule" "ingress" {
-  for_each          = {
+  for_each = {
     for key, value in var.ports : key => value
     if var.disable_security_groups == false
   }
@@ -135,7 +135,7 @@ resource "aws_lb" "balancer" {
     }
   }
 
-  security_groups                  = var.disable_security_groups ? null : [aws_security_group.balancer[0].id] # Disable for backwards compatability with version 2 of this module
+  security_groups = var.disable_security_groups ? null : [aws_security_group.balancer[0].id] # Disable for backwards compatability with version 2 of this module
 
   tags = merge(
     var.tags,
