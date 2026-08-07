@@ -49,6 +49,7 @@ resource "aws_lb_target_group" "target_groups" {
   deregistration_delay = var.deregistration_delay
   port                 = each.value["target_port"]
   preserve_client_ip   = var.preserve_client_ip
+  proxy_protocol_v2    = each.value["proxy_protocol_v2"]
   protocol             = "TCP"
   vpc_id               = var.vpc_id
 

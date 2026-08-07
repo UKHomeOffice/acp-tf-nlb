@@ -33,8 +33,9 @@ variable "subnet_ids" {
 variable "ports" {
   description = "A map of ports and autoscaling groups to make listeners/target groups/ attachments from"
   type = map(object({
-    target_port   = string
-    target_groups = list(string)
+    target_port       = string
+    target_groups     = list(string)
+    proxy_protocol_v2 = optional(bool, false)
   }))
 }
 
