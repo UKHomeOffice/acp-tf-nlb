@@ -35,6 +35,7 @@ variable "ports" {
   type = map(object({
     target_port   = string
     target_groups = list(string)
+    proxy_protocol_v2 = optional(bool, false)
   }))
 }
 
