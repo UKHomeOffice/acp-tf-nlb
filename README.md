@@ -87,7 +87,7 @@ No modules.
 | <a name="input_internal"></a> [internal](#input\_internal) | Indicates if the ELB should be an internal load balancer, defaults to true | `bool` | `true` | no |
 | <a name="input_internal_nlb_subnet_mappings"></a> [internal\_nlb\_subnet\_mappings](#input\_internal\_nlb\_subnet\_mappings) | n/a | <pre>map(object({<br/>    subnet_id            = string,<br/>    private_ipv4_address = string<br/>  }))</pre> | `{}` | no |
 | <a name="input_name"></a> [name](#input\_name) | A descriptive name for this ELB | `any` | n/a | yes |
-| <a name="input_ports"></a> [ports](#input\_ports) | A map of ports and autoscaling groups to make listeners/target groups/ attachments from | <pre>map(object({<br/>    target_port   = string<br/>    target_groups = list(string)<br/>  }))</pre> | n/a | yes |
+| <a name="input_ports"></a> [ports](#input\_ports) | A map of ports and autoscaling groups to make listeners/target groups/ attachments from | <pre>map(object({<br/>    target_port       = string<br/>    target_groups     = list(string)<br/>    proxy_protocol_v2 = optional(bool, false)<br/>  }))</pre> | n/a | yes |
 | <a name="input_preserve_client_ip"></a> [preserve\_client\_ip](#input\_preserve\_client\_ip) | Whether to preserve the client (source) IP - false will regard all traffic as originating from the eni, for example | `bool` | `true` | no |
 | <a name="input_security_group_ingress_cidr"></a> [security\_group\_ingress\_cidr](#input\_security\_group\_ingress\_cidr) | CIDR ranges to allow access to this NLB | `list(string)` | n/a | yes |
 | <a name="input_subnet_ids"></a> [subnet\_ids](#input\_subnet\_ids) | A list of subnet id's to be used for the NLB | `list` | `[]` | no |
